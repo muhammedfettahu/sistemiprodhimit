@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="sq">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🔥 Menaxhimi i Mbetjeve</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+<style>
+body{font-family:'Poppins',sans-serif;background:linear-gradient(135deg,#0f172a,#1e293b);color:white;margin:0;padding:20px}
+h1{text-align:center;font-weight:600}
+.container{max-width:900px;margin:auto}
+.card{background:#1e293b;padding:20px;margin:15px 0;border-radius:16px;box-shadow:0 10px 25px rgba(0,0,0,0.3)}
+button{padding:12px;border:none;border-radius:12px;background:linear-gradient(45deg,#22c55e,#06b6d4);color:white;cursor:pointer;font-weight:600;transition:0.2s}
+button:hover{transform:scale(1.05)}
+input,select{padding:10px;margin:6px 0;width:100%;border-radius:10px;border:none;background:#334155;color:white}
+.list-item{background:#334155;padding:12px;margin:8px 0;border-radius:12px;display:flex;justify-content:space-between;align-items:center}
+.hidden{display:none}
+</style>
+</head>
+<body>
+<div class="container">
+<h1>🔥 Menaxhimi i Mbetjeve</h1>
+
+<div class="card">
+<h2>➕ Shto Mbetje</h2>
+<select id="material" onchange="updateFields()">
+<option value="">Zgjidh material</option>
+<option value="xham">🪟 Xham</option>
+<option value="profil">🧱 Profil</option>
+</select>
+
+<select id="lloji" class="hidden"></select>
+<select id="ngjyra"></select>
+
+<input type="number" id="gjeresia" placeholder="📏 Gjeresia (cm)">
+<input type="number" id="lartesia" placeholder="📏 Lartesia (cm)">
+<input type="number" id="masa" class="hidden" placeholder="📏 Masa (cm)">
+<input type="number" id="sasia" placeholder="🔢 Sasia">
+<button onclick="shtoMbetje()">➕ Shto</button>
+</div>
+
+<div class="card">
+<h2>📦 Porosi e Re</h2>
+<select id="material2" onchange="updateFields2()">
+<option value="">Zgjidh material</option>
+<option value="xham">🪟 Xham</option>
+<option value="profil">🧱 Profil</option>
+</select>
+
+<select id="lloji2" class="hidden"></select>
+<select id="ngjyra2"></select>
+
+<input type="number" id="gjeresia2" placeholder="📏 Gjeresia">
+<input type="number" id="lartesia2" placeholder="📏 Lartesia (vetem xham)">
+<input type="number" id="masa2" class="hidden" placeholder="📏 Masa (cm)">
+<input type="number" id="sasia2" placeholder="🔢 Sasia">
+<button onclick="gjej()">🔍 Gjej nga magazina</button>
+</div>
+
+<div class="card">
+<h2>📋 Magazina</h2>
+<div id="lista"></div>
+</div>
+</div>
+
+<script>
+let db = JSON.parse(localStorage.getItem("mbetje")||"[]");
+
+function ruaj(){localStorage.setItem("mbetje",JSON.stringify(db));render();}
+
+function updateFields(){
+let m=document.getElementById("material").value;
+let lloji=document.getElementById("lloji");
+let ngjyra=document.getElementById("ngjyra");
+let g=document.getElementById("gjeresia");
+let l=document.getElementById("lartesia");
+let masa=document.getElementById("masa");
+
+lloji.innerHTML="";
+ngjyra.innerHTML="";
+
+if(m=="xham"){
+lloji.classList.add("hidden");
+g.classList.remove("hidden");
+l.classList.remove("hidden");
+masa.classList.add("hidden");
+ngjyra.innerHTML=`<option value="Transparent">Transparent</option><option value="E Zeze">E Zeze</option>`;
+}else if(m=="profil"){
+lloji.classList.remove("hidden");
+lloji.innerHTML=`<option value="Baze">Profil Bazë</option><option value="Xhami">Profil Xhami</option><option value="Anesor">Profil Anësor</option>`;
+ngjyra.innerHTML=`<option value="Hiri">Hiri</option><option value="Antracid">Antracid</option>`;
+
+g.classList.add("hidden");
+l.classList.add("hidden");
+masa.classList.remove("hidden");
+}
+}
+
+function updateFields2(){
+let m=document.getElementById("material2").value;
+let lloji=document.getElementById("lloji2");
+let ngjyra=document.getElementById("ngjyra2");
+let g=document.getElementById("gjeresia2");
+let l=document.getElementById("lartesia2");
+let masa=document.getElementById("masa2");
+
+lloji.innerHTML="";
+ngjyra.innerHTML="";
+
+if(m=="xham"){
+lloji.classList.add("hidden");
+g.classList.remove("hidden");
+l.classList.remove("hidden");
+masa.classList.add("hidden");
+ngjyra.innerHTML=`<option value="Transparent">Transparent</option><option value="E Zeze">E Zeze</option>`;
+}else if(m=="profil"){
+lloji.classList.remove("hidden");
+lloji.innerHTML=`<option value="Baze">Profil Bazë</option><option value="Xhami">Profil Xhami</option><option value="Anesor">Profil Anësor</option>`;
+ngjyra.innerHTML=`<option value="Hiri">Hiri</option><option value="Antracid">Antracid</option>`;
+
+g.classList.add("hidden");
+l.classList.add("hidden");
+masa.classList.remove("hidden");
+}
+}
+
+function shtoMbetje(){
+let m=document.getElementById("material").value;
+let lloji=document.getElementById("lloji").value||"";
+let n=document.getElementById("ngjyra").value;
+let g=+document.getElementById("gjeresia").value;
+let l=+document.getElementById("lartesia").value;
+let masa=+document.getElementById("masa").value;
+let s=+document.getElementById("sasia").value;
+
+if(!m||!n||!s)return alert("Plotëso të gjitha");
+
+if(m=="profil"){
+if(!masa)return alert("Vendos masën");
+db.push({m,lloji,n,g:masa,l:0,s});
+}else{
+if(!g||!l)return alert("Vendos madhësitë");
+db.push({m,lloji,n,g,l,s});
+}
+
+ruaj();
+}
+
+function render(){
+let el=document.getElementById("lista");
+el.innerHTML="";
+
+db.forEach((i,idx)=>{
+let d=document.createElement("div");
+d.className="list-item";
+d.innerHTML=`<div>🔹 ${i.m} ${i.lloji||""}<br>🎨 ${i.n}<br>📏 ${i.l?i.g+"x"+i.l:i.g+"cm"}<br>🔢 ${i.s}</div>
+<button onclick="fshi(${idx})">❌</button>`;
+el.appendChild(d);
+});
+}
+
+function fshi(i){db.splice(i,1);ruaj();}
+
+function gjej(){
+let m=document.getElementById("material2").value;
+let lloji=document.getElementById("lloji2").value||"";
+let n=document.getElementById("ngjyra2").value;
+let g=+document.getElementById("gjeresia2").value;
+let l=+document.getElementById("lartesia2").value;
+let masa=+document.getElementById("masa2").value;
+
+let ops;
+if(m=="profil"){
+ops=db.filter(x=>x.m==m&&x.n==n&&x.lloji==lloji&&x.g>=masa);
+}else{
+ops=db.filter(x=>x.m==m&&x.n==n&&x.g>=g&&x.l>=l);
+}
+
+if(ops.length==0){alert("❌ Nuk ka në magazinë");return;}
+
+let best=ops.sort((a,b)=>(a.g*(a.l||1))-(b.g*(b.l||1)))[0];
+
+alert("✅ Përdor këtë: "+(m=="profil"?best.g+"cm":best.g+"x"+best.l));
+
+best.s--;
+if(best.s<=0)db=db.filter(x=>x!=best);
+
+ruaj();
+}
+
+render();
+</script>
+</body>
+</html>
